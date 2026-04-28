@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { getMe, apiFetch } from '@/lib/api'
 import Navbar from '@/components/Navbar'
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL
+
 export default function ProfilesPage() {
   const router = useRouter()
   const [user, setUser] = useState(null)
@@ -43,78 +45,62 @@ export default function ProfilesPage() {
   const totalPages = Math.ceil(total / 10)
 
   return (
-    <div style={{ minHeight: '100vh', background: '#0f1117' }}>
+    <div style={{minHeight:'100vh',background:'#0f1117'}}>
       <Navbar user={user} />
-      <div style={{ padding: '40px 32px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+      <div style={{padding:'40px 32px'}}>
+
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'32px'}}>
           <div>
-            <h1 style={{ fontSize: '24px', fontWeight: '700', color: '#f1f5f9' }}>Profiles</h1>
-            <p style={{ color: '#64748b', fontSize: '14px' }}>{total} total profiles</p>
+            <h1 style={{fontSize:'24px',fontWeight:'700',color:'#f1f5f9'}}>Profiles</h1>
+            <p style={{color:'#64748b',fontSize:'14px'}}>{total} total profiles</p>
           </div>
           
-            href={`${process.env.NEXT_PUBLIC_API_URL}/api/profiles/export?format=csv`}
-            style={{
-              padding: '10px 20px',
-              background: '#1e2330',
-              color: '#94a3b8',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              fontSize: '14px',
-              border: '1px solid #2d3748',
-            }}
+            href={`${API_URL}/api/profiles/export?format=csv`}
+            style={{padding:'10px 20px',background:'#1e2330',color:'#94a3b8',borderRadius:'8px',textDecoration:'none',fontSize:'14px',border:'1px solid #2d3748'}}
           >
             Export CSV
           </a>
         </div>
 
         {/* Filters */}
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
-          {[
-            { key: 'gender', options: ['', 'male', 'female'], label: 'Gender' },
-            { key: 'age_group', options: ['', 'child', 'teenager', 'adult', 'senior'], label: 'Age Group' },
-          ].map(f => (
-            <select
-              key={f.key}
-              value={filters[f.key]}
-              onChange={e => { setFilters(p => ({ ...p, [f.key]: e.target.value })); setPage(1) }}
-              style={{
-                padding: '8px 12px',
-                background: '#1e2330',
-                border: '1px solid #2d3748',
-                borderRadius: '6px',
-                color: '#e2e8f0',
-                fontSize: '14px',
-              }}
-            >
-              <option value="">{f.label}: All</option>
-              {f.options.filter(Boolean).map(o => (
-                <option key={o} value={o}>{o.charAt(0).toUpperCase() + o.slice(1)}</option>
-              ))}
-            </select>
-          ))}
+        <div style={{display:'flex',gap:'12px',marginBottom:'24px',flexWrap:'wrap'}}>
+          <select
+            value={filters.gender}
+            onChange={e => { setFilters(p => ({...p, gender: e.target.value})); setPage(1) }}
+            style={{padding:'8px 12px',background:'#1e2330',border:'1px solid #2d3748',borderRadius:'6px',color:'#e2e8f0',fontSize:'14px'}}
+          >
+            <option value="">Gender: All</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+
+          <select
+            value={filters.age_group}
+            onChange={e => { setFilters(p => ({...p, age_group: e.target.value})); setPage(1) }}
+            style={{padding:'8px 12px',background:'#1e2330',border:'1px solid #2d3748',borderRadius:'6px',color:'#e2e8f0',fontSize:'14px'}}
+          >
+            <option value="">Age Group: All</option>
+            <option value="child">Child</option>
+            <option value="teenager">Teenager</option>
+            <option value="adult">Adult</option>
+            <option value="senior">Senior</option>
+          </select>
+
           <input
             placeholder="Country code (e.g. NG)"
             value={filters.country_id}
-            onChange={e => { setFilters(p => ({ ...p, country_id: e.target.value })); setPage(1) }}
-            style={{
-              padding: '8px 12px',
-              background: '#1e2330',
-              border: '1px solid #2d3748',
-              borderRadius: '6px',
-              color: '#e2e8f0',
-              fontSize: '14px',
-              width: '180px',
-            }}
+            onChange={e => { setFilters(p => ({...p, country_id: e.target.value})); setPage(1) }}
+            style={{padding:'8px 12px',background:'#1e2330',border:'1px solid #2d3748',borderRadius:'6px',color:'#e2e8f0',fontSize:'14px',width:'180px'}}
           />
         </div>
 
         {/* Table */}
-        <div style={{ background: '#1e2330', borderRadius: '12px', overflow: 'hidden', border: '1px solid #2d3748' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <div style={{background:'#1e2330',borderRadius:'12px',overflow:'hidden',border:'1px solid #2d3748'}}>
+          <table style={{width:'100%',borderCollapse:'collapse'}}>
             <thead>
-              <tr style={{ borderBottom: '1px solid #2d3748' }}>
-                {['Name', 'Gender', 'Age', 'Age Group', 'Country', 'Created'].map(h => (
-                  <th key={h} style={{ padding: '14px 16px', textAlign: 'left', fontSize: '12px', color: '#64748b', textTransform: 'uppercase', fontWeight: '600' }}>
+              <tr style={{borderBottom:'1px solid #2d3748'}}>
+                {['Name','Gender','Age','Age Group','Country','Created'].map(h => (
+                  <th key={h} style={{padding:'14px 16px',textAlign:'left',fontSize:'12px',color:'#64748b',textTransform:'uppercase',fontWeight:'600'}}>
                     {h}
                   </th>
                 ))}
@@ -122,23 +108,29 @@ export default function ProfilesPage() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>Loading...</td></tr>
+                <tr>
+                  <td colSpan={6} style={{padding:'40px',textAlign:'center',color:'#64748b'}}>Loading...</td>
+                </tr>
               ) : profiles.length === 0 ? (
-                <tr><td colSpan={6} style={{ padding: '40px', textAlign: 'center', color: '#64748b' }}>No profiles found</td></tr>
+                <tr>
+                  <td colSpan={6} style={{padding:'40px',textAlign:'center',color:'#64748b'}}>No profiles found</td>
+                </tr>
               ) : profiles.map(p => (
-                <tr key={p.id} style={{ borderBottom: '1px solid #1a1f2e', cursor: 'pointer' }}
-                  onClick={() => router.push(`/profiles/${p.id}`)}>
-                  <td style={{ padding: '14px 16px', color: '#f1f5f9', fontSize: '14px' }}>{p.name}</td>
-                  <td style={{ padding: '14px 16px', color: '#94a3b8', fontSize: '14px' }}>{p.gender}</td>
-                  <td style={{ padding: '14px 16px', color: '#94a3b8', fontSize: '14px' }}>{p.age}</td>
-                  <td style={{ padding: '14px 16px', fontSize: '14px' }}>
-                    <span style={{
-                      padding: '2px 8px', borderRadius: '4px', fontSize: '12px',
-                      background: '#1a2f1a', color: '#4ade80',
-                    }}>{p.age_group}</span>
+                <tr
+                  key={p.id}
+                  onClick={() => router.push(`/profiles/${p.id}`)}
+                  style={{borderBottom:'1px solid #1a1f2e',cursor:'pointer'}}
+                >
+                  <td style={{padding:'14px 16px',color:'#f1f5f9',fontSize:'14px'}}>{p.name}</td>
+                  <td style={{padding:'14px 16px',color:'#94a3b8',fontSize:'14px'}}>{p.gender}</td>
+                  <td style={{padding:'14px 16px',color:'#94a3b8',fontSize:'14px'}}>{p.age}</td>
+                  <td style={{padding:'14px 16px',fontSize:'14px'}}>
+                    <span style={{padding:'2px 8px',borderRadius:'4px',fontSize:'12px',background:'#1a2f1a',color:'#4ade80'}}>
+                      {p.age_group}
+                    </span>
                   </td>
-                  <td style={{ padding: '14px 16px', color: '#94a3b8', fontSize: '14px' }}>{p.country_id}</td>
-                  <td style={{ padding: '14px 16px', color: '#64748b', fontSize: '13px' }}>
+                  <td style={{padding:'14px 16px',color:'#94a3b8',fontSize:'14px'}}>{p.country_id}</td>
+                  <td style={{padding:'14px 16px',color:'#64748b',fontSize:'13px'}}>
                     {new Date(p.created_at).toLocaleDateString()}
                   </td>
                 </tr>
@@ -148,19 +140,26 @@ export default function ProfilesPage() {
         </div>
 
         {/* Pagination */}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '24px' }}>
-          <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
-            style={{ padding: '8px 16px', background: '#1e2330', border: '1px solid #2d3748', borderRadius: '6px', color: '#94a3b8', cursor: 'pointer' }}>
+        <div style={{display:'flex',justifyContent:'center',gap:'8px',marginTop:'24px',alignItems:'center'}}>
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+            style={{padding:'8px 16px',background:'#1e2330',border:'1px solid #2d3748',borderRadius:'6px',color:'#94a3b8',cursor:'pointer'}}
+          >
             Previous
           </button>
-          <span style={{ padding: '8px 16px', color: '#64748b', fontSize: '14px' }}>
-            Page {page} of {totalPages}
+          <span style={{padding:'8px 16px',color:'#64748b',fontSize:'14px'}}>
+            Page {page} of {totalPages || 1}
           </span>
-          <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page === totalPages}
-            style={{ padding: '8px 16px', background: '#1e2330', border: '1px solid #2d3748', borderRadius: '6px', color: '#94a3b8', cursor: 'pointer' }}>
+          <button
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages || totalPages === 0}
+            style={{padding:'8px 16px',background:'#1e2330',border:'1px solid #2d3748',borderRadius:'6px',color:'#94a3b8',cursor:'pointer'}}
+          >
             Next
           </button>
         </div>
+
       </div>
     </div>
   )
