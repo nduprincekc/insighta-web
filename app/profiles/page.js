@@ -32,8 +32,7 @@ export default function ProfilesPage() {
     if (filters.gender) params.append('gender', filters.gender)
     if (filters.country_id) params.append('country_id', filters.country_id)
     if (filters.age_group) params.append('age_group', filters.age_group)
-
-    const res = await apiFetch(`/api/profiles?${params}`)
+    const res = await apiFetch('/api/profiles?' + params)
     if (res && res.ok) {
       const data = await res.json()
       setProfiles(data.data)
@@ -54,15 +53,14 @@ export default function ProfilesPage() {
             <h1 style={{fontSize:'24px',fontWeight:'700',color:'#f1f5f9'}}>Profiles</h1>
             <p style={{color:'#64748b',fontSize:'14px'}}>{total} total profiles</p>
           </div>
-          
-            href={`${API_URL}/api/profiles/export?format=csv`}
-            style={{padding:'10px 20px',background:'#1e2330',color:'#94a3b8',borderRadius:'8px',textDecoration:'none',fontSize:'14px',border:'1px solid #2d3748'}}
+          <button
+            onClick={() => window.open(API_URL + '/api/profiles/export?format=csv', '_blank')}
+            style={{padding:'10px 20px',background:'#1e2330',color:'#94a3b8',borderRadius:'8px',fontSize:'14px',border:'1px solid #2d3748',cursor:'pointer'}}
           >
             Export CSV
-          </a>
+          </button>
         </div>
 
-        {/* Filters */}
         <div style={{display:'flex',gap:'12px',marginBottom:'24px',flexWrap:'wrap'}}>
           <select
             value={filters.gender}
@@ -87,14 +85,13 @@ export default function ProfilesPage() {
           </select>
 
           <input
-            placeholder="Country code (e.g. NG)"
+            placeholder="Country code e.g. NG"
             value={filters.country_id}
             onChange={e => { setFilters(p => ({...p, country_id: e.target.value})); setPage(1) }}
             style={{padding:'8px 12px',background:'#1e2330',border:'1px solid #2d3748',borderRadius:'6px',color:'#e2e8f0',fontSize:'14px',width:'180px'}}
           />
         </div>
 
-        {/* Table */}
         <div style={{background:'#1e2330',borderRadius:'12px',overflow:'hidden',border:'1px solid #2d3748'}}>
           <table style={{width:'100%',borderCollapse:'collapse'}}>
             <thead>
@@ -109,16 +106,20 @@ export default function ProfilesPage() {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={6} style={{padding:'40px',textAlign:'center',color:'#64748b'}}>Loading...</td>
+                  <td colSpan={6} style={{padding:'40px',textAlign:'center',color:'#64748b'}}>
+                    Loading...
+                  </td>
                 </tr>
               ) : profiles.length === 0 ? (
                 <tr>
-                  <td colSpan={6} style={{padding:'40px',textAlign:'center',color:'#64748b'}}>No profiles found</td>
+                  <td colSpan={6} style={{padding:'40px',textAlign:'center',color:'#64748b'}}>
+                    No profiles found
+                  </td>
                 </tr>
               ) : profiles.map(p => (
                 <tr
                   key={p.id}
-                  onClick={() => router.push(`/profiles/${p.id}`)}
+                  onClick={() => router.push('/profiles/' + p.id)}
                   style={{borderBottom:'1px solid #1a1f2e',cursor:'pointer'}}
                 >
                   <td style={{padding:'14px 16px',color:'#f1f5f9',fontSize:'14px'}}>{p.name}</td>
@@ -139,7 +140,6 @@ export default function ProfilesPage() {
           </table>
         </div>
 
-        {/* Pagination */}
         <div style={{display:'flex',justifyContent:'center',gap:'8px',marginTop:'24px',alignItems:'center'}}>
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
