@@ -4,6 +4,8 @@ import { useRouter } from 'next/navigation'
 import { getMe, apiFetch, saveTokens } from '@/lib/api'
 import Navbar from '@/components/Navbar'
 
+
+const API_URL = 'https://hng-task-3-05rc.onrender.com'
 export default function DashboardPage() {
   const router = useRouter()
   const [user, setUser] = useState(null)
