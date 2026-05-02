@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { getMe, apiFetch } from '@/lib/api'
 import Navbar from '@/components/Navbar'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL
+const API_URL = 'https://hng-task-3-05rc.onrender.com'
 
 export default function ProfilesPage() {
   const router = useRouter()
@@ -41,6 +41,31 @@ export default function ProfilesPage() {
     setLoading(false)
   }
 
+  const handleExport = async () => {
+    const token = localStorage.getItem('access_token')
+    const res = await fetch(`${API_URL}/api/profiles/export?format=csv`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'X-API-Version': '1',
+      },
+    })
+
+    if (!res.ok) {
+      alert('Export failed — make sure you are logged in')
+      return
+    }
+
+    const blob = await res.blob()
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `profiles_${Date.now()}.csv`
+    document.body.appendChild(a)
+    a.click()
+    window.URL.revokeObjectURL(url)
+    document.body.removeChild(a)
+  }
+
   const totalPages = Math.ceil(total / 10)
 
   return (
@@ -54,7 +79,7 @@ export default function ProfilesPage() {
             <p style={{color:'#64748b',fontSize:'14px'}}>{total} total profiles</p>
           </div>
           <button
-            onClick={() => window.open(API_URL + '/api/profiles/export?format=csv', '_blank')}
+            onClick={handleExport}
             style={{padding:'10px 20px',background:'#1e2330',color:'#94a3b8',borderRadius:'8px',fontSize:'14px',border:'1px solid #2d3748',cursor:'pointer'}}
           >
             Export CSV
